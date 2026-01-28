@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   StatusBar,
+  Alert,
 } from "react-native";
 import { useContext, useState, useCallback } from "react";
 import { AuthContext } from "../../src/context/AuthContext";
@@ -20,16 +21,16 @@ export default function Orders() {
   const loadOrders = async () => {
     try {
       const res = await getMyOrdersApi(TOKEN);
-      setOrders(res.data.data.orders);
-    } catch (e) {
-      alert("Failed to load orders");
+      setOrders(res?.data?.data?.orders || []);
+    } catch (error) {
+      Alert.alert("Error", "Failed to load orders");
     }
   };
 
   useFocusEffect(
     useCallback(() => {
-      loadOrders();
-    }, [])
+      if (TOKEN) loadOrders();
+    }, [TOKEN])
   );
 
   if (orders.length === 0) {
@@ -46,15 +47,11 @@ export default function Orders() {
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
 
-      {/* 🔷 Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>My Orders</Text>
-        <Text style={styles.sub}>
-          {orders.length} orders found
-        </Text>
+        <Text style={styles.sub}>{orders.length} orders found</Text>
       </View>
 
-      {/* 🔷 Orders */}
       <FlatList
         data={orders}
         keyExtractor={(item) => item._id}
@@ -89,95 +86,81 @@ export default function Orders() {
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#020617",
   },
-
   header: {
     padding: 16,
     borderBottomWidth: 1,
     borderColor: "#1e293b",
   },
-
   headerTitle: {
     color: "white",
     fontSize: 22,
     fontWeight: "900",
   },
-
   sub: {
     color: "#94a3b8",
     marginTop: 2,
   },
-
   empty: {
     flex: 1,
     backgroundColor: "#020617",
     justifyContent: "center",
     alignItems: "center",
   },
-
   emptyText: {
     color: "#94a3b8",
     marginTop: 10,
     fontSize: 18,
   },
-
   card: {
     backgroundColor: "#0f172a",
     margin: 14,
     borderRadius: 18,
     padding: 14,
   },
-
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
-
   id: {
     color: "#38bdf8",
     fontWeight: "900",
   },
-
   statusPill: {
     backgroundColor: "#1e293b",
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 20,
   },
-
   status: {
     color: "#fbbf24",
     fontWeight: "700",
     fontSize: 12,
     textTransform: "capitalize",
   },
-
   divider: {
     height: 1,
     backgroundColor: "#1e293b",
     marginVertical: 10,
   },
-
   infoRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginTop: 6,
   },
-
   label: {
     color: "#94a3b8",
   },
-
   value: {
     color: "white",
     fontWeight: "700",
   },
-
   total: {
     color: "#38bdf8",
     fontWeight: "900",
